@@ -1,8 +1,10 @@
 package it.polito.tdp.genes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.genes.model.Adiacenza;
 import it.polito.tdp.genes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,19 +29,34 @@ public class FXMLController {
     private Button btnRicerca;
 
     @FXML
-    private ComboBox<?> boxLocalizzazione;
+    private ComboBox<String> boxLocalizzazione;
 
     @FXML
     private TextArea txtResult;
 
     @FXML
     void doRicerca(ActionEvent event) {
+    	
+    	
 
     }
 
     @FXML
     void doStatistiche(ActionEvent event) {
-
+    	String localizzazione= boxLocalizzazione.getValue();
+    	if(localizzazione==null) {
+    		txtResult.setText("Selezionare una Localizzazione \n");
+    		return;
+    	}
+    	
+    	List<Adiacenza> adiacenze= model.getAdiacenze(localizzazione);
+    	if(adiacenze.isEmpty())
+    		txtResult.setText("Adiacenze non trovate \n\n");
+    	
+    	txtResult.appendText("\n"+"Adiacenti a: "+localizzazione+"\n");
+    	for(Adiacenza a: adiacenze) {
+    		txtResult.appendText(a.getV1()+" peso: "+a.getPeso()+"\n");
+    	}
     }
 
     @FXML
@@ -53,5 +70,9 @@ public class FXMLController {
 
 	public void setModel(Model model) {
 		this.model = model;
+		model.creaGrafo();
+		txtResult.appendText("Grafo creato. #vertici: "+model.getNVertici()+" #archi: "+model.getNArchi()+"\n\n");
+		
+		boxLocalizzazione.getItems().addAll(model.getLocalizzazioni());
 	}
 }
